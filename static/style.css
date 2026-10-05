@@ -1,0 +1,416 @@
+/* ==========================================================
+   RESET Y VARIABLES (MOBILE-FIRST)
+   ========================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg-principal: #0d1117;
+    --bg-tarjeta: #161b22;
+    --bg-codigo: #090d12;
+    --borde-color: #30363d;
+    --texto-color: #f0f6fc;
+    --texto-secundario: #8b949e;
+    
+    --verde-acento: #238636;
+    --verde-brillante: #3fb950;
+    --azul-acento: #58a6ff;
+    --naranja-caballo: #ff5722;
+    --rojo-retroceso: #f85149;
+    
+    --tam-casilla: min(38px, calc((100vw - 56px) / 8));
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-principal);
+    color: var(--texto-color);
+    line-height: 1.5;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.app-header {
+    text-align: center;
+    margin-bottom: 16px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.app-header h1 {
+    font-size: 1.35rem;
+    color: var(--verde-brillante);
+    font-weight: 700;
+}
+
+.subtitulo {
+    font-size: 0.85rem;
+    color: var(--texto-secundario);
+    margin-top: 4px;
+}
+
+/* Barra de Navegación */
+.barra-navegacion, .panel-instrucciones {
+    background-color: var(--bg-tarjeta);
+    border: 1px solid var(--borde-color);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.badge-origen {
+    font-size: 0.95rem;
+    color: var(--texto-color);
+}
+
+.controles-velocidad {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.btn-vel {
+    background-color: #21262d;
+    color: var(--texto-color);
+    border: 1px solid var(--borde-color);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-vel:hover {
+    background-color: #30363d;
+}
+
+.btn-vel.activa {
+    background-color: var(--azul-acento);
+    color: #000000;
+    font-weight: 700;
+    border-color: var(--azul-acento);
+}
+
+.btn-pausa.en-pausa {
+    background-color: var(--naranja-caballo);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.btn-reiniciar {
+    background-color: var(--naranja-caballo);
+    color: #ffffff;
+    text-decoration: none;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Tablero */
+.tablero-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.tablero {
+    display: grid;
+    grid-template-columns: repeat(8, var(--tam-casilla));
+    grid-template-rows: repeat(8, var(--tam-casilla));
+    gap: 2px;
+    background-color: #21262d;
+    padding: 6px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.casilla {
+    width: var(--tam-casilla);
+    height: var(--tam-casilla);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: calc(var(--tam-casilla) * 0.36);
+    border-radius: 3px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s, transform 0.15s;
+}
+
+.clara { background-color: #f0d9b5; color: #333333; }
+.oscura { background-color: #b58863; color: #ffffff; }
+
+.casilla:hover {
+    filter: brightness(1.2);
+    outline: 2px dashed var(--naranja-caballo);
+}
+
+.caballo-actual {
+    background-color: var(--naranja-caballo) !important;
+    color: #ffffff !important;
+    transform: scale(1.08);
+    box-shadow: 0 0 10px var(--naranja-caballo);
+    z-index: 2;
+}
+
+.visitada {
+    background-color: var(--verde-acento) !important;
+    color: #ffffff !important;
+}
+
+.retroceso {
+    background-color: rgba(248, 81, 73, 0.45) !important;
+    color: transparent !important;
+}
+
+/* Tarjetas */
+.comparacion-contenedor {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.metodo-card {
+    background-color: var(--bg-tarjeta);
+    border: 1px solid var(--borde-color);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.card-header {
+    text-align: center;
+    width: 100%;
+}
+
+.tipo-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background-color: rgba(35, 134, 54, 0.2);
+    color: var(--verde-brillante);
+    border: 1px solid var(--verde-acento);
+    margin-bottom: 4px;
+}
+
+.ciega-badge {
+    background-color: rgba(88, 166, 255, 0.15);
+    color: var(--azul-acento);
+    border-color: var(--azul-acento);
+}
+
+.ref-slide {
+    font-size: 0.75rem;
+    color: #ffb74d;
+    font-weight: 600;
+}
+
+.formula-eval {
+    font-size: 0.8rem;
+    color: var(--texto-secundario);
+    margin-top: 2px;
+}
+
+.mensaje-estado {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    min-height: 24px;
+}
+
+/* Métricas Ampliadas */
+.metricas-panel {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.25);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--borde-color);
+}
+
+.metrica {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.metrica-etiqueta {
+    font-size: 0.7rem;
+    color: var(--texto-secundario);
+}
+
+.metrica-valor {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-top: 2px;
+}
+
+.dest-verde {
+    color: var(--verde-brillante) !important;
+}
+
+.dest-rojo {
+    color: var(--rojo-retroceso) !important;
+}
+
+/* Código */
+.codigo-desplegable {
+    width: 100%;
+    background-color: var(--bg-codigo);
+    border: 1px solid var(--borde-color);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    text-align: left;
+}
+
+.codigo-desplegable summary {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--texto-secundario);
+}
+
+.codigo-desplegable pre {
+    padding: 10px 12px;
+    overflow-x: auto;
+    border-top: 1px solid var(--borde-color);
+    color: #e6edf3;
+    font-family: Consolas, monospace;
+}
+
+/* Tabla Comparativa Final */
+.seccion-tabla-comparativa {
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 30px;
+    background-color: var(--bg-tarjeta);
+    border: 1px solid var(--borde-color);
+    border-radius: 12px;
+    padding: 18px;
+}
+
+.seccion-tabla-comparativa h3 {
+    font-size: 1.1rem;
+    color: var(--verde-brillante);
+    margin-bottom: 14px;
+    text-align: center;
+}
+
+.tabla-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabla-metricas {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    text-align: left;
+}
+
+.tabla-metricas th, .tabla-metricas td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--borde-color);
+}
+
+.tabla-metricas th {
+    background-color: #21262d;
+    color: var(--texto-color);
+}
+
+.tabla-metricas tr:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.88);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.modal-contenido {
+    background-color: var(--bg-tarjeta);
+    border: 2px solid var(--verde-acento);
+    padding: 25px 35px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(35, 134, 54, 0.4);
+    max-width: 360px;
+    width: 100%;
+}
+
+.numero-arcade {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--naranja-caballo);
+    margin-top: 10px;
+}
+
+/* Tablet & Desktop */
+@media (min-width: 768px) {
+    :root {
+        --tam-casilla: 42px;
+    }
+    .app-header h1 {
+        font-size: 1.8rem;
+    }
+    .barra-navegacion {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .tabla-metricas {
+        font-size: 0.9rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --tam-casilla: 46px;
+    }
+    body {
+        padding: 25px;
+    }
+    .comparacion-contenedor {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: center;
+    }
+    .metodo-card {
+        flex: 1;
+        max-width: 580px;
+    }
+}

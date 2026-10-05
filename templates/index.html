@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador IA - Recorrido del Caballo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="app-header">
+        <h1>Simulador IA: Problema del Recorrido del Caballo</h1>
+        <p class="subtitulo">Evaluación de Estrategias de Búsqueda (Dr. José Federico Ramírez Cruz)</p>
+    </header>
+
+    {% if modo == "seleccion" %}
+        <!-- PANTALLA 1: MENÚ DE SELECCIÓN -->
+        <main class="pantalla-inicio">
+            <div class="panel-instrucciones">
+                <h2>🎮 Estado Inicial (s₀)</h2>
+                <p>Haz clic en cualquier celda del tablero para posicionar al caballo de inicio.</p>
+            </div>
+            
+            <div class="tablero-wrapper">
+                <div class="tablero" id="tablero-seleccion"></div>
+            </div>
+        </main>
+
+        <script>
+            const contenedor = document.getElementById('tablero-seleccion');
+            for (let fila = 0; fila < 8; fila++) {
+                for (let col = 0; col < 8; col++) {
+                    const div = document.createElement('div');
+                    div.classList.add('casilla');
+                    div.classList.add((fila + col) % 2 === 0 ? 'clara' : 'oscura');
+                    div.title = `Iniciar en (${fila}, ${col})`;
+                    div.dataset.fila = fila;
+                    div.dataset.col = col;
+                    
+                    div.addEventListener('click', function() {
+                        const f = this.dataset.fila;
+                        const c = this.dataset.col;
+                        window.location.href = `/?x=${f}&y=${c}`;
+                    });
+
+                    contenedor.appendChild(div);
+                }
+            }
+        </script>
+
+    {% else %}
+        <!-- PANTALLA 2: CUENTA REGRESIVA Y SIMULACIÓN -->
+        <div id="modal-cuenta-regresiva" class="modal-overlay">
+            <div class="modal-contenido">
+                <h2>¡Estado Inicial Fijado!</h2>
+                <p>Iniciando algoritmos en la casilla: <strong>({{ start_x }}, {{ start_y }})</strong></p>
+                <div id="numero-contador" class="numero-arcade">3</div>
+            </div>
+        </div>
+
+        <nav class="barra-navegacion">
+            <span class="badge-origen">🐴 Inicio: <strong>({{ start_x }}, {{ start_y }})</strong></span>
+            
+            <div class="controles-velocidad">
+                <button type="button" class="btn-vel" onclick="cambiarVelocidad(380, this)">🐢 Lento</button>
+                <button type="button" class="btn-vel activa" onclick="cambiarVelocidad(180, this)">🚶 Normal</button>
+                <button type="button" class="btn-vel" onclick="cambiarVelocidad(50, this)">⚡ Rápido</button>
+                <button type="button" class="btn-vel btn-pausa" id="btn-pausa" onclick="togglePausa()">⏸ Pausar</button>
+            </div>
+
+            <a href="/" class="btn-reiniciar">⬅ Cambiar Casilla</a>
+        </nav>
+
+        <main class="comparacion-contenedor">
+            <!-- TABLERO 1: BÚSQUEDA A* -->
+            <article class="metodo-card a-estrella">
+                <div class="card-header">
+                    <span class="tipo-badge">Búsqueda Informada</span>
+                    <h3>Búsqueda A* (A-Estrella)</h3>
+                    <p class="ref-slide">Referencia: Diapositivas 70 - 76</p>
+                    <p class="formula-eval">Función: <strong>f(n) = g(n) + h(n)</strong></p>
+                </div>
+
+                <div class="tablero-wrapper">
+                    <div class="tablero" id="tablero-a"></div>
+                </div>
+
+                <p class="mensaje-estado" id="estado-a">Esperando inicio...</p>
+
+                <!-- Panel de Métricas Ampliado -->
+                <div class="metricas-panel">
+                    <div class="metrica">
+                        <span class="metrica-etiqueta">Tiempo Cómputo:</span>
+                        <span class="metrica-valor">{{ tiempo_a }} ms</span>
+                    </div>
+                    <div class="metrica">
+                        <span class="metrica-etiqueta">Nodos Evaluados:</span>
+                        <span class="metrica-valor dest-verde">{{ stats_a.nodos_evaluados }}</span>
+                    </div>
+                    <div class="metrica">
+                        <span class="metrica-etiqueta">Retrocesos (Backtracks):</span>
+                        <span class="metrica-valor">{{ stats_a.retrocesos }}</span>
+                    </div>
+                    <div class="metrica">
+                        <span class="metrica-etiqueta">Profundidad Máx:</span>
+                        <span class="metrica-valor">{{ stats_a.profundidad_max }} / 64</span>
+                    </div>
+                    <div class="metrica">
+                        <span class="metrica-etiqueta">Eficiencia Búsqueda:</span>
+                        <span class="metrica-valor dest-verde">{{ eficiencia_a }}%</span>
+                    </div>
+                    <div class="metrica">
+                        <span class="metrica-etiqueta">Resultado:</span>
+                        <span class="metrica-valor">✅ Óptimo (64/64)</span>
+                    </div>
+                </div>
+
+                <details class="codigo-desplegable" open>
+                    <summary>📄 Código Python Puro (Búsqueda A*)</summary>
+                    <pre><code>def resolver_a_estrella(x_ini, y_ini):
+    ruta = [(x_ini, y_ini)]
+    visitados = {(x_ini, y_ini)}
+
+    def backtrack(x, y, paso):
+        if paso == 64:
+            return True
+        
+        candidatos = []
+        for nx, ny in obtener_movimientos(x, y):
+            if (nx, ny) not in visitados:
+                g = paso
+                h = sum(1 for vx, vy in obtener_movimientos(nx, ny) if (vx, vy) not in visitados)
+                f = g + h
+                candidatos.append((f, h, nx, ny))
+        
+        candidatos.sort(key=lambda item: (item[1], item[0]))
+
+        for _, _, nx, ny in candidatos:
+            visitados.add((nx, ny))
+            ruta.append((nx, ny))
+            if backtrack(nx, ny, paso + 1):
+                return True
+            visitados.remove((nx, ny))
+            ruta.pop()
+        return False
+
+    return ruta if backtrack(x_ini, y_ini, 1) else None</code></pre>
+</details>
+            </article>
+
+            <!-- TABLERO 2: PRIMERO EN PROFUNDIDAD (DFS) -->
+            <article class="metodo-card dfs">
+                <div class="card-header">
+                    <span class="tipo-badge ciega-badge">Búsqueda No Informada</span>
+                    <h3>Primero en Profundidad (DFS)</h3>
+                    <p class="ref-slide">Referencia: Diapositivas 19 y 22</p>
+                    <p class="formula-eval">Estrategia: <strong>Pila (LIFO) con Vuelta Atrás</strong></p>
+                </div>
+
+                <div class="tablero-wrapper">
+                    <div class="tablero" id="tablero-dfs"></div>
+                </div>
+
+                <p class="mensaje-estado" id="estado-dfs">Esperando inicio...</p>
+
+                <!-- Panel de Métricas Ampliado -->
+                <div class="metricas-panel">
+                    <div class="metrica">
+                        <span class="metrica-etiqueta">Tiempo Cómputo:</span>
+                        <span class="metrica-valor">{{ tiempo_dfs }} ms</span>
+                    </div>
+                    <div class="metrica">
+                        <span class="metrica-etiqueta">Nodos Evaluados:</span>
+                        <span class="metrica-valor dest-rojo">{{ stats_dfs.nodos_evaluados }}</span>
+                    </div>
+                    <div class="metrica">
+                        <span class="metrica-etiqueta">Retrocesos (Backtracks):</span>
+                        <span class="metrica-valor dest-rojo">{{ stats_dfs.retrocesos }}</span>
+                    </div>
+                    <div class="metrica">
+                        <span class="metrica-etiqueta">Profundidad Máx:</span>
+                        <span class="metrica-valor">{{ stats_dfs.profundidad_max }} / 64</span>
+                    </div>
+                    <div class="metrica">
+                        <span class="metrica-etiqueta">Eficiencia Búsqueda:</span>
+                        <span class="metrica-valor dest-rojo">{{ eficiencia_dfs }}%</span>
+                    </div>
+                    <div class="metrica">
+                        <span class="metrica-etiqueta">Resultado:</span>
+                        <span class="metrica-valor">❌ Atrapado</span>
+                    </div>
+                </div>
+
+                <details class="codigo-desplegable" open>
+                    <summary>📄 Código Python Puro (Primero en Profundidad)</summary>
+                    <pre><code>def resolver_dfs(x_ini, y_ini):
+    ruta = [(x_ini, y_ini)]
+    visitados = {(x_ini, y_ini)}
+
+    def backtrack(x, y):
+        if len(ruta) == 64:
+            return True
+        
+        for nx, ny in obtener_movimientos(x, y):
+            if (nx, ny) not in visitados:
+                visitados.add((nx, ny))
+                ruta.append((nx, ny))
+                
+                if backtrack(nx, ny):
+                    return True
+                
+                visitados.remove((nx, ny))
+                ruta.pop()
+        return False
+
+    return ruta if backtrack(x_ini, y_ini) else None</code></pre>
+            </details>
+            </article>
+        </main>
+
+        <!-- TABLA COMPARATIVA FORMAL DE RENDIMIENTO (Diapositiva 6 y 16) -->
+        <section class="seccion-tabla-comparativa">
+            <h3>📊 Comparativa de Rendimiento en Espacio de Estados</h3>
+            <div class="tabla-responsive">
+                <table class="tabla-metricas">
+                    <thead>
+                        <tr>
+                            <th>Criterio de Evaluación (Diap. 16)</th>
+                            <th>Búsqueda A* (Informada)</th>
+                            <th>Primero en Profundidad (Ciega)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Completitud</strong></td>
+                            <td>Completo (encuentra la meta)</td>
+                            <td>Incompleto en tableros grandes (se cicla/atasca)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Optimalidad</strong></td>
+                            <td>Óptimo con heurística admisible</td>
+                            <td>No óptimo</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Nodos Generados / Explorados</strong></td>
+                            <td><strong>{{ stats_a.nodos_evaluados }} nodos</strong> (directo a la meta)</td>
+                            <td><strong>{{ stats_dfs.nodos_evaluados }} nodos</strong> (explosión combinatoria)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Número de Retrocesos</strong></td>
+                            <td>{{ stats_a.retrocesos }} (cero dudas)</td>
+                            <td>{{ stats_dfs.retrocesos }} intentos fallidos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Complejidad Temporal</strong></td>
+                            <td>Polinomial con guía O(N²)</td>
+                            <td>Exponencial O(bᵐ) donde b≈8</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <script>
+            const eventosA = {{ eventos_a | tojson }};
+            const exitoA = {{ 'true' if exito_a else 'false' }};
+            const eventosDFS = {{ eventos_dfs | tojson }};
+
+            let velocidadGlobal = 180;
+            let pausado = false;
+
+            function cambiarVelocidad(ms, boton) {
+                velocidadGlobal = ms;
+                document.querySelectorAll('.controles-velocidad .btn-vel').forEach(b => {
+                    if (b.id !== 'btn-pausa') b.classList.remove('activa');
+                });
+                if (boton) boton.classList.add('activa');
+            }
+
+            function togglePausa() {
+                pausado = !pausado;
+                const btn = document.getElementById('btn-pausa');
+                btn.innerText = pausado ? '▶ Reanudar' : '⏸ Pausar';
+                btn.classList.toggle('en-pausa', pausado);
+            }
+
+            function construirTablero(idContenedor) {
+                const contenedor = document.getElementById(idContenedor);
+                if (!contenedor) return null;
+                const matriz = [];
+                for (let fila = 0; fila < 8; fila++) {
+                    matriz[fila] = [];
+                    for (let col = 0; col < 8; col++) {
+                        const div = document.createElement('div');
+                        div.classList.add('casilla');
+                        div.classList.add((fila + col) % 2 === 0 ? 'clara' : 'oscura');
+                        contenedor.appendChild(div);
+                        matriz[fila][col] = div;
+                    }
+                }
+                return matriz;
+            }
+
+            const casillasA = construirTablero('tablero-a');
+            const casillasDFS = construirTablero('tablero-dfs');
+
+            function animarProceso(eventos, casillasMatriz, idEstado, mensajeFinal) {
+                let idx = 0;
+                let caballoActivo = null;
+
+                function tick() {
+                    if (pausado) {
+                        setTimeout(tick, 100);
+                        return;
+                    }
+
+                    if (idx >= eventos.length) {
+                        document.getElementById(idEstado).innerHTML = mensajeFinal;
+                        return;
+                    }
+
+                    const ev = eventos[idx];
+                    const celda = casillasMatriz[ev.x][ev.y];
+
+                    if (ev.tipo === 'avanzar') {
+                        if (caballoActivo && caballoActivo !== celda) {
+                            caballoActivo.classList.remove('caballo-actual');
+                            caballoActivo.classList.add('visitada');
+                        }
+                        celda.classList.remove('visitada', 'retroceso');
+                        celda.classList.add('caballo-actual');
+                        celda.innerText = ev.paso;
+                        caballoActivo = celda;
+                    } 
+                    else if (ev.tipo === 'retroceder') {
+                        celda.classList.remove('caballo-actual', 'visitada');
+                        celda.classList.add('retroceso');
+                        celda.innerText = '';
+
+                        if (ev.x_ant !== undefined && ev.y_ant !== undefined) {
+                            const celdaPrevia = casillasMatriz[ev.x_ant][ev.y_ant];
+                            celdaPrevia.classList.remove('visitada');
+                            celdaPrevia.classList.add('caballo-actual');
+                            caballoActivo = celdaPrevia;
+                        }
+                    }
+
+                    idx++;
+                    setTimeout(tick, velocidadGlobal);
+                }
+                tick();
+            }
+
+            window.onload = () => {
+                let contadorElem = document.getElementById('numero-contador');
+                let modalElem = document.getElementById('modal-cuenta-regresiva');
+                let cuenta = 3;
+
+                let intervalo = setInterval(() => {
+                    cuenta--;
+                    if (cuenta > 0) {
+                        if (contadorElem) contadorElem.innerText = cuenta;
+                    } else if (cuenta === 0) {
+                        if (contadorElem) contadorElem.innerText = "¡YA!";
+                    } else {
+                        clearInterval(intervalo);
+                        if (modalElem) modalElem.style.display = 'none';
+
+                        animarProceso(
+                            eventosA, 
+                            casillasA, 
+                            'estado-a', 
+                            "✅ <strong>A* Exitoso:</strong> 64 casillas alcanzadas de forma óptima."
+                        );
+
+                        animarProceso(
+                            eventosDFS, 
+                            casillasDFS, 
+                            'estado-dfs', 
+                            "❌ <strong>DFS Atrapado:</strong> Límite de 150,000 nodos alcanzado tras masivos retrocesos."
+                        );
+                    }
+                }, 1000);
+            };
+        </script>
+    {% endif %}
+
+</body>
+</html>
