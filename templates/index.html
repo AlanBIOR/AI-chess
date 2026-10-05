@@ -10,14 +10,14 @@
 
     <header class="app-header">
         <h1>Simulador IA: Problema del Recorrido del Caballo</h1>
-        <p class="subtitulo">Evaluación de Estrategias de Búsqueda (Dr. José Federico Ramírez Cruz)</p>
+        <p class="subtitulo">Evaluación de Búsqueda - Dr. José Federico Ramírez Cruz</p>
     </header>
 
     {% if modo == "seleccion" %}
-        <!-- PANTALLA 1: MENÚ DE SELECCIÓN -->
+        <!-- PANTALLA 1: MENÚ DE SELECCIÓN INICIAL -->
         <main class="pantalla-inicio">
             <div class="panel-instrucciones">
-                <h2>🎮 Estado Inicial (s₀)</h2>
+                <h2>🎮 Estado Inicial</h2>
                 <p>Haz clic en cualquier celda del tablero para posicionar al caballo de inicio.</p>
             </div>
             
@@ -49,7 +49,7 @@
         </script>
 
     {% else %}
-        <!-- PANTALLA 2: CUENTA REGRESIVA Y SIMULACIÓN -->
+        <!-- PANTALLA 2: CUENTA REGRESIVA Y SIMULACIÓN EN TIEMPO REAL -->
         <div id="modal-cuenta-regresiva" class="modal-overlay">
             <div class="modal-contenido">
                 <h2>¡Estado Inicial Fijado!</h2>
@@ -87,7 +87,6 @@
 
                 <p class="mensaje-estado" id="estado-a">Esperando inicio...</p>
 
-                <!-- Panel de Métricas Ampliado -->
                 <div class="metricas-panel">
                     <div class="metrica">
                         <span class="metrica-etiqueta">Tiempo Cómputo:</span>
@@ -111,7 +110,7 @@
                     </div>
                     <div class="metrica">
                         <span class="metrica-etiqueta">Resultado:</span>
-                        <span class="metrica-valor">✅ Óptimo (64/64)</span>
+                        <span class="metrica-valor">{% if exito_a %}✅ Óptimo (64/64){% else %}❌ Sin solución{% endif %}</span>
                     </div>
                 </div>
 
@@ -145,7 +144,7 @@
         return False
 
     return ruta if backtrack(x_ini, y_ini, 1) else None</code></pre>
-</details>
+                </details>
             </article>
 
             <!-- TABLERO 2: PRIMERO EN PROFUNDIDAD (DFS) -->
@@ -154,7 +153,7 @@
                     <span class="tipo-badge ciega-badge">Búsqueda No Informada</span>
                     <h3>Primero en Profundidad (DFS)</h3>
                     <p class="ref-slide">Referencia: Diapositivas 19 y 22</p>
-                    <p class="formula-eval">Estrategia: <strong>Pila (LIFO) con Vuelta Atrás</strong></p>
+                    <p class="formula-eval">Estrategia: <strong>Pila (LIFO)</strong></p>
                 </div>
 
                 <div class="tablero-wrapper">
@@ -163,7 +162,6 @@
 
                 <p class="mensaje-estado" id="estado-dfs">Esperando inicio...</p>
 
-                <!-- Panel de Métricas Ampliado -->
                 <div class="metricas-panel">
                     <div class="metrica">
                         <span class="metrica-etiqueta">Tiempo Cómputo:</span>
@@ -187,7 +185,7 @@
                     </div>
                     <div class="metrica">
                         <span class="metrica-etiqueta">Resultado:</span>
-                        <span class="metrica-valor">❌ Atrapado</span>
+                        <span class="metrica-valor">{% if exito_dfs %}✅ 64 casillas{% else %}❌ Atrapado{% endif %}</span>
                     </div>
                 </div>
 
@@ -214,11 +212,11 @@
         return False
 
     return ruta if backtrack(x_ini, y_ini) else None</code></pre>
-            </details>
+                </details>
             </article>
         </main>
 
-        <!-- TABLA COMPARATIVA FORMAL DE RENDIMIENTO (Diapositiva 6 y 16) -->
+        <!-- TABLA COMPARATIVA FORMAL DE RENDIMIENTO -->
         <section class="seccion-tabla-comparativa">
             <h3>📊 Comparativa de Rendimiento en Espacio de Estados</h3>
             <div class="tabla-responsive">
@@ -248,7 +246,7 @@
                         </tr>
                         <tr>
                             <td><strong>Número de Retrocesos</strong></td>
-                            <td>{{ stats_a.retrocesos }} (cero dudas)</td>
+                            <td>{{ stats_a.retrocesos }} intentos</td>
                             <td>{{ stats_dfs.retrocesos }} intentos fallidos</td>
                         </tr>
                         <tr>
@@ -262,6 +260,7 @@
         </section>
 
         <script>
+            // Datos inyectados dinámicamente desde Flask
             const eventosA = {{ eventos_a | tojson }};
             const exitoA = {{ 'true' if exito_a else 'false' }};
             const eventosDFS = {{ eventos_dfs | tojson }};

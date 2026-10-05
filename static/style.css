@@ -1,6 +1,3 @@
-/* ==========================================================
-   RESET Y VARIABLES (MOBILE-FIRST)
-   ========================================================== */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -14,14 +11,12 @@
     --borde-color: #30363d;
     --texto-color: #f0f6fc;
     --texto-secundario: #8b949e;
-    
     --verde-acento: #238636;
     --verde-brillante: #3fb950;
     --azul-acento: #58a6ff;
     --naranja-caballo: #ff5722;
     --rojo-retroceso: #f85149;
-    
-    --tam-casilla: min(38px, calc((100vw - 56px) / 8));
+    --tam-casilla: min(40px, calc((100vw - 60px) / 8));
 }
 
 body {
@@ -29,7 +24,7 @@ body {
     background-color: var(--bg-principal);
     color: var(--texto-color);
     line-height: 1.5;
-    padding: 12px;
+    padding: 14px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -43,7 +38,7 @@ body {
 }
 
 .app-header h1 {
-    font-size: 1.35rem;
+    font-size: 1.4rem;
     color: var(--verde-brillante);
     font-weight: 700;
 }
@@ -54,7 +49,6 @@ body {
     margin-top: 4px;
 }
 
-/* Barra de Navegación */
 .barra-navegacion, .panel-instrucciones {
     background-color: var(--bg-tarjeta);
     border: 1px solid var(--borde-color);
@@ -120,11 +114,11 @@ body {
     font-weight: 600;
 }
 
-/* Tablero */
 .tablero-wrapper {
     display: flex;
     justify-content: center;
     width: 100%;
+    margin-top: 10px;
 }
 
 .tablero {
@@ -178,7 +172,6 @@ body {
     color: transparent !important;
 }
 
-/* Tarjetas */
 .comparacion-contenedor {
     display: flex;
     flex-direction: column;
@@ -240,7 +233,6 @@ body {
     min-height: 24px;
 }
 
-/* Métricas Ampliadas */
 .metricas-panel {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -278,7 +270,6 @@ body {
     color: var(--rojo-retroceso) !important;
 }
 
-/* Código */
 .codigo-desplegable {
     width: 100%;
     background-color: var(--bg-codigo);
@@ -303,7 +294,6 @@ body {
     font-family: Consolas, monospace;
 }
 
-/* Tabla Comparativa Final */
 .seccion-tabla-comparativa {
     width: 100%;
     max-width: 1200px;
@@ -347,7 +337,6 @@ body {
     background-color: rgba(255, 255, 255, 0.03);
 }
 
-/* Modal */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -380,7 +369,6 @@ body {
     margin-top: 10px;
 }
 
-/* Tablet & Desktop */
 @media (min-width: 768px) {
     :root {
         --tam-casilla: 42px;
